@@ -1,11 +1,5 @@
 import matplotlib.pyplot as plt
 
-def SIR(S, I, R, beta, gamma, dt):
-    dS = -beta * S * I * dt
-    dI = (beta * S * I - gamma * I) * dt
-    dR = gamma * I * dt
-    return dS, dI, dR
-
 def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     steps = int(t / dt)
 
@@ -16,6 +10,7 @@ def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     T = [0] * (steps + 1)
 
     # Condiciones iniciales
+    N = S0 + I0 + R0
     S[0] = S0
     I[0] = I0
     R[0] = R0
@@ -24,7 +19,9 @@ def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     for step in range(steps):
         T[step + 1] = T[step] + dt
         
-        dS, dI, dR = SIR(S[step], I[step], R[step], beta, gamma, dt)
+        dS = -beta * S[step] * I[step]/N * dt
+        dI = (beta * S[step] * I[step]/N - gamma * I[step]) * dt
+        dR = gamma * I[step] * dt
         
         S[step + 1] = S[step] + dS
         I[step + 1] = I[step] + dI
@@ -40,6 +37,18 @@ def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     
     return T, S, I, R
 
+def plot(T, S, I, R):
+    plt.figure(figsize=(10, 6))
+    plt.plot(T, S, label='Susceptibles (S)')
+    plt.plot(T, I, label='Infectados (I)')
+    plt.plot(T, R, label='Recuperados (R)')
+    plt.xlabel('Días')
+    plt.ylabel('Número de individuos')
+    plt.title('Modelo SIR usando el método de Euler')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
 def main():
     
     beta = 0.3
@@ -59,15 +68,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
-def plot(T, S, I, R):
-    plt.figure(figsize=(10, 6))
-    plt.plot(T, S, label='Susceptibles (S)')
-    plt.plot(T, I, label='Infectados (I)')
-    plt.plot(T, R, label='Recuperados (R)')
-    plt.xlabel('Días')
-    plt.ylabel('Número de individuos')
-    plt.title('Modelo SIR usando el método de Euler')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
