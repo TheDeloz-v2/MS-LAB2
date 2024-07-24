@@ -1,13 +1,14 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     steps = int(t / dt)
 
     # Inicializacion de los vectores
-    S = [0] * (steps + 1)
-    I = [0] * (steps + 1)
-    R = [0] * (steps + 1)
-    T = [0] * (steps + 1)
+    S = np.zeros(steps)
+    I = np.zeros(steps)
+    R = np.zeros(steps)
+    T = np.zeros(steps)
 
     # Condiciones iniciales
     N = S0 + I0 + R0
@@ -16,24 +17,25 @@ def eulersEpidemic(S0, I0, R0, t, dt, gamma, beta):
     R[0] = R0
 
     # Metodo de Euler
-    for step in range(steps):
-        T[step + 1] = T[step] + dt
+    for step in range(1, steps):
+        T[step] = step * dt
         
-        dS = -beta * S[step] * I[step]/N * dt
-        dI = (beta * S[step] * I[step]/N - gamma * I[step]) * dt
-        dR = gamma * I[step] * dt
+        dS = -beta * S[step - 1] * I[step - 1] / N * dt
+        dI = (beta * S[step - 1] * I[step - 1] / N - gamma * I[step - 1]) * dt
+        dR = gamma * I[step - 1] * dt
         
-        S[step + 1] = S[step] + dS
-        I[step + 1] = I[step] + dI
-        R[step + 1] = R[step] + dR
+        S[step] = S[step - 1] + dS
+        I[step] = I[step - 1] + dI
+        R[step] = R[step - 1] + dR
         
-        S[step + 1] = max(S[step + 1], 0)
-        I[step + 1] = max(I[step + 1], 0)
-        R[step + 1] = max(R[step + 1], 0)
+        S[step] = max(S[step], 0)
+        I[step] = max(I[step], 0)
+        R[step] = max(R[step], 0)
         
-    print(f"S(t={t}) = {S[-1]}")
-    print(f"I(t={t}) = {I[-1]}")
-    print(f"R(t={t}) = {R[-1]}")
+    print(f"Población:\tN = {N}")
+    print(f"Susceptibless:\tS(t={t}) = {round(S[-1])}")
+    print(f"Infectados:\tI(t={t}) = {round(I[-1])}")
+    print(f"Recuperados:\tR(t={t}) = {round(R[-1])}")
     
     return T, S, I, R
 
